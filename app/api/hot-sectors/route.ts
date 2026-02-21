@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import pool from '@/lib/db'
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 interface StockPrice {
     wics_name: string

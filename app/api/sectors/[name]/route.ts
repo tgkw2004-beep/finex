@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import pool from '@/lib/db'
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 async function getTradingDay(schema: string, table: string, targetStr: string, direction: 'back' | 'forward' | 'both' = 'back') {
     const target = new Date(targetStr)

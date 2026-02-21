@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import type { DartCompanyInfo } from '@/types/stock'
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 export async function GET(
     request: NextRequest,
