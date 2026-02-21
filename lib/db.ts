@@ -12,7 +12,7 @@ const pool = new Pool({
 
 // Set schema so we don't have to specify remote_market.xxx or remote_visual.xxx
 pool.on('connect', (client) => {
-    client.query(`SET search_path TO public, remote_market, remote_visual`);
+    client.query(`SET search_path TO public, remote_market, remote_visual, remote_company`);
 });
 
 // Helper to reliably ping/test the connection

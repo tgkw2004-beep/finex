@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase as publicSupabase } from '@/lib/supabase/client'
 import pool from '@/lib/db'
 
 export const revalidate = 60
@@ -29,14 +28,14 @@ export async function GET(
         }
 
         const corpGroup = targetCompany.corp_group
-        // If no group or "일반", return simple self-node (or handle gracefully)
+        // If no group or "일반", return simple self-node
         if (!corpGroup || corpGroup === '일반' || corpGroup === '-') {
             return NextResponse.json({
                 nodes: [{
                     id: targetCompany.stock_code,
                     name: targetCompany.stock_name,
                     revenue: parseFloat(targetCompany.revenue) || 0,
-                    change: 0, // Placeholder
+                    change: 0,
                     isListed: true,
                     group: corpGroup
                 }],
@@ -80,7 +79,6 @@ export async function GET(
 
         // Create map of latest sales: stock_code -> sales
         const salesMap = new Map<string, number>()
-
         const processFinancials = (data: any[]) => {
             if (!data) return
             data.forEach(item => {
@@ -89,17 +87,13 @@ export async function GET(
                 }
             })
         }
-
         processFinancials(kospiRes.rows)
         processFinancials(kosdaqRes.rows)
 
         groupCompanies.forEach(comp => {
             if (comp.stock_code || comp.corp_code) {
                 const id = comp.stock_code || comp.corp_code
-
-                // Use sales from KIS tables if available, otherwise fallback to comp.revenue
                 const revenue = salesMap.get(comp.stock_code) || parseFloat(comp.revenue) || 0
-
                 const node = {
                     id: id,
                     name: comp.stock_name || comp.corp_name,
@@ -107,26 +101,27 @@ export async function GET(
                     change: 0,
                     isListed: !!comp.stock_code,
                     group: corpGroup,
-                    isTarget: id === targetCompany.stock_code // Mark target
+                    isTarget: id === targetCompany.stock_code
                 }
                 nodes.push(node)
-
                 if (comp.stock_name) companyMapByStockName.set(comp.stock_name, id)
                 if (comp.corp_code) companyMapByCorpCode.set(comp.corp_code, id)
             }
         })
 
-        // 3. Get ALL holdings where Investor IS IN the group
+        // 3. Get holdings using direct DB query
         const investorNames = Array.from(companyMapByStockName.keys())
 
-        // Still using Supabase for this local table since it wasn't exposed on the remote DB
-        const { data: holdings, error: holdingsError } = await publicSupabase
-            .from('major_stock_holdings')
-            .select('rcept_dt, corp_code, corp_name, repror, stkrt')
-            .in('repror', investorNames)
-            .order('rcept_dt', { ascending: false })
-
-        if (holdingsError) throw holdingsError
+        let holdings: any[] = []
+        if (investorNames.length > 0) {
+            const holdingsRes = await pool.query(`
+                SELECT rcept_dt, corp_code, corp_name, repror, stkrt
+                FROM public.major_stock_holdings
+                WHERE repror = ANY($1)
+                ORDER BY rcept_dt DESC
+            `, [investorNames])
+            holdings = holdingsRes.rows
+        }
 
         // 3.1 Identify External Nodes (Investees not in Group)
         const externalCorpCodes = new Set<string>()
@@ -149,19 +144,16 @@ export async function GET(
                 WHERE corp_code = ANY($1)
             `, [extCodesArray])
 
-            const externalCompanies = extRes.rows
-
-            externalCompanies.forEach(c => {
+            extRes.rows.forEach(c => {
                 const revenue = parseFloat(c.revenue) || 0
                 externalNodesMap.set(c.corp_code, {
                     id: c.stock_code || c.corp_code,
                     name: c.stock_name || c.corp_name,
                     revenue: revenue,
                     isListed: !!c.stock_code,
-                    group: 'External', // Mark as external
+                    group: 'External',
                     isTarget: false
                 })
-                // Add to main lookup maps to support linking
                 if (c.stock_name) companyMapByStockName.set(c.stock_name, c.stock_code || c.corp_code)
                 if (c.corp_code) companyMapByCorpCode.set(c.corp_code, c.stock_code || c.corp_code)
             })
@@ -170,21 +162,17 @@ export async function GET(
         // Add External Nodes to the list
         externalCorpCodes.forEach(code => {
             if (!externalNodesMap.has(code)) {
-                // Not found in master list -> Likely Unlisted or Data Missing
                 const holdingInfo = holdings.find(h => h.corp_code === code)
                 if (holdingInfo) {
-                    const id = code
-                    const node = {
-                        id: id,
+                    nodes.push({
+                        id: code,
                         name: holdingInfo.corp_name,
-                        revenue: 0, // Unknown
+                        revenue: 0,
                         isListed: false,
                         group: 'External',
                         isTarget: false
-                    }
-                    nodes.push(node)
-                    // Add to lookup (corp_code is the key here)
-                    companyMapByCorpCode.set(code, id)
+                    })
+                    companyMapByCorpCode.set(code, code)
                 }
             } else {
                 nodes.push(externalNodesMap.get(code))
@@ -193,16 +181,14 @@ export async function GET(
 
         // 4. Process links
         const links: any[] = []
-        const edgesSet = new Set<string>() // To track unique "Investor(Source) -> Investee(Target)"
+        const edgesSet = new Set<string>()
 
         for (const h of holdings) {
-            const investorId = companyMapByStockName.get(h.repror) // Source (Group Member)
-            const investeeId = companyMapByCorpCode.get(h.corp_code) // Target (Group or External)
+            const investorId = companyMapByStockName.get(h.repror)
+            const investeeId = companyMapByCorpCode.get(h.corp_code)
 
-            // Link if both nodes exist (Investor is Group, Investee is Group OR External)
             if (investorId && investeeId && investorId !== investeeId) {
                 const edgeKey = `${investorId}-${investeeId}`
-
                 if (!edgesSet.has(edgeKey)) {
                     edgesSet.add(edgeKey)
                     links.push({
@@ -215,11 +201,7 @@ export async function GET(
             }
         }
 
-        return NextResponse.json({
-            nodes,
-            links,
-            groupName: corpGroup
-        })
+        return NextResponse.json({ nodes, links, groupName: corpGroup })
 
     } catch (error) {
         console.error('Network API Error:', error)
