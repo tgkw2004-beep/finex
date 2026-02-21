@@ -1,0 +1,28 @@
+# Docker files
+Dockerfile
+.dockerignore
+
+# Dependencies
+node_modules
+
+# Build artifacts
+.next
+npm-debug.log
+tsconfig.tsbuildinfo
+
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+dev_note
+
+# IDE and OS files
+.DS_Store
+.vscode
+.idea
+
+# Environment files (will be passed via docker-compose)
+.env.local
+

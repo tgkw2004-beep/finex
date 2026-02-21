@@ -1,0 +1,404 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { AnalysisHeader } from "@/components/dashboard/analysis-header"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
+import { ArrowLeft, CalendarIcon } from "lucide-react"
+import Link from "next/link"
+import { format } from "date-fns"
+import { ko } from "date-fns/locale"
+import { cn } from "@/lib/utils"
+
+interface ClosingStock {
+  date: string
+  stock_code: string
+  stock_name: string
+  open: number
+  close: number
+  cap?: number
+  trading_amount?: number
+  select_reason?: string
+  prev_close?: number
+  prev_open?: number
+  prev_day?: string
+  trading_amount_category?: string
+}
+
+type ViewMode = 'all' | 'table1' | 'table2' | 'table3'
+
+export default function ClosingPage() {
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+  const [table1Data, setTable1Data] = useState<ClosingStock[]>([])
+  const [table2Data, setTable2Data] = useState<ClosingStock[]>([])
+  const [table3Data, setTable3Data] = useState<ClosingStock[]>([])
+  const [hasData, setHasData] = useState({ table1: false, table2: false, table3: false })
+  const [loading, setLoading] = useState(true)
+  const [viewMode, setViewMode] = useState<ViewMode>('all')
+
+  // Fetch data when date changes
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true)
+        const dateStr = format(selectedDate, 'yyyy-MM-dd')
+        const response = await fetch(`/api/momentum/closing?date=${dateStr}`)
+
+        if (response.ok) {
+          const data = await response.json()
+          setTable1Data(data.table1 || [])
+          setTable2Data(data.table2 || [])
+          setTable3Data(data.table3 || [])
+          setHasData(data.hasData || { table1: false, table2: false, table3: false })
+        }
+      } catch (error) {
+        console.error('Failed to fetch closing data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [selectedDate])
+
+  const formatNumber = (num: number) => num?.toLocaleString() || '-'
+
+  const StockRow = ({ stock, showPrevData = false }: { stock: ClosingStock, showPrevData?: boolean }) => (
+    <HoverCard>
+      <HoverCardTrigger asChild>
+        <tr className="cursor-pointer hover:bg-accent/50 transition-colors border-b border-border/40">
+          <td className="py-3 px-4">
+            <Link href={`/dashboard/stock/${stock.stock_code}`} className="block">
+              <div className="font-medium">{stock.stock_name}</div>
+              <div className="text-xs text-muted-foreground">{stock.stock_code}</div>
+            </Link>
+          </td>
+          <td className="py-3 px-4 text-right font-medium">
+            {formatNumber(stock.close)}
+          </td>
+          <td className="py-3 px-4 text-right font-medium">
+            {formatNumber(stock.open)}
+          </td>
+        </tr>
+      </HoverCardTrigger>
+      <HoverCardContent className="w-80" side="right">
+        <div className="space-y-2">
+          <h4 className="text-sm font-semibold">{stock.stock_name} ({stock.stock_code})</h4>
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <div className="text-muted-foreground text-xs">종가</div>
+              <div className="font-medium">{formatNumber(stock.close)}원</div>
+            </div>
+            <div>
+              <div className="text-muted-foreground text-xs">시가</div>
+              <div className="font-medium">{formatNumber(stock.open)}원</div>
+            </div>
+            {stock.cap && (
+              <div>
+                <div className="text-muted-foreground text-xs">시가총액</div>
+                <div className="font-medium">{(stock.cap / 1000000000000).toFixed(2)}조</div>
+              </div>
+            )}
+            {stock.trading_amount && (
+              <div>
+                <div className="text-muted-foreground text-xs">거래대금</div>
+                <div className="font-medium">{(stock.trading_amount / 100000000).toFixed(0)}억</div>
+              </div>
+            )}
+            {showPrevData && stock.prev_close && (
+              <>
+                <div>
+                  <div className="text-muted-foreground text-xs">전일 종가</div>
+                  <div className="font-medium">{formatNumber(stock.prev_close)}원</div>
+                </div>
+                <div>
+                  <div className="text-muted-foreground text-xs">전일 시가</div>
+                  <div className="font-medium">{formatNumber(stock.prev_open || 0)}원</div>
+                </div>
+              </>
+            )}
+          </div>
+          {stock.select_reason && (
+            <div className="pt-2 border-t">
+              <div className="text-muted-foreground text-xs">선정 이유</div>
+              <div className="text-sm">{stock.select_reason}</div>
+            </div>
+          )}
+          {stock.trading_amount_category && (
+            <div className="pt-2 border-t">
+              <div className="text-muted-foreground text-xs">거래대금 구분</div>
+              <div className="text-sm">{stock.trading_amount_category}</div>
+            </div>
+          )}
+        </div>
+      </HoverCardContent>
+    </HoverCard>
+  )
+
+  // Detailed view for a single table with all columns
+  const DetailedTableView = ({ data, tableNumber }: { data: ClosingStock[], tableNumber: number }) => {
+    if (data.length === 0) return null
+
+    const allKeys = Object.keys(data[0] || {})
+
+    return (
+      <Card className="p-4">
+        <h3 className="mb-4 text-lg font-semibold">종가매매 {tableNumber} - 전체 정보</h3>
+        <div className="overflow-x-auto rounded-lg border border-border/40">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50">
+              <tr>
+                {allKeys.map((key) => (
+                  <th key={key} className="py-2 px-3 text-left text-xs font-medium whitespace-nowrap">
+                    {key === 'date' ? '날짜' :
+                      key === 'stock_code' ? '종목코드' :
+                        key === 'stock_name' ? '종목명' :
+                          key === 'open' ? '시가' :
+                            key === 'close' ? '종가' :
+                              key === 'cap' ? '시가총액' :
+                                key === 'trading_amount' ? '거래대금' :
+                                  key === 'select_reason' ? '선정이유' :
+                                    key === 'prev_close' ? '전일종가' :
+                                      key === 'prev_open' ? '전일시가' :
+                                        key === 'prev_day' ? '전일구분' :
+                                          key === 'trading_amount_category' ? '거래대금구분' :
+                                            key}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((stock, idx) => (
+                <tr key={idx} className="border-b border-border/40 hover:bg-accent/50">
+                  {allKeys.map((key) => (
+                    <td key={key} className="py-2 px-3 whitespace-nowrap">
+                      {key === 'cap' && stock[key] ?
+                        `${(stock[key] / 1000000000000).toFixed(2)}조` :
+                        key === 'trading_amount' && stock[key] ?
+                          `${(stock[key] / 100000000).toFixed(0)}억` :
+                          (key === 'open' || key === 'close' || key === 'prev_open' || key === 'prev_close') && stock[key] ?
+                            formatNumber(stock[key]) :
+                            stock[key] || '-'}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    )
+  }
+
+  const totalStocks = table1Data.length + table2Data.length + table3Data.length
+
+  return (
+    <div>
+      <div className="mb-4">
+        <Link href="/dashboard/momentum">
+          <Button variant="ghost" size="sm" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            모멘텀 전략으로 돌아가기
+          </Button>
+        </Link>
+      </div>
+
+      <AnalysisHeader
+        title="종가매매 전략"
+        description="종가 기준 강한 마감 패턴을 보이는 종목을 탐지합니다"
+      />
+
+      {/* Date Picker */}
+      <div className="mb-6">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "w-[280px] justify-start text-left font-normal",
+                !selectedDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {selectedDate ? format(selectedDate, "PPP", { locale: ko }) : <span>날짜를 선택하세요</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={(date) => date && setSelectedDate(date)}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      <div className="space-y-6">
+        {/* Statistics Cards - Clickable */}
+        <div className="grid gap-4 sm:grid-cols-4">
+          <Card
+            className={cn(
+              "p-3 cursor-pointer transition-all hover:shadow-md",
+              viewMode === 'all' && "ring-2 ring-primary"
+            )}
+            onClick={() => setViewMode('all')}
+          >
+            <div className="mb-1 text-xs text-muted-foreground">전체 종목</div>
+            <div className="text-xl font-bold text-primary">{totalStocks}</div>
+          </Card>
+          <Card
+            className={cn(
+              "p-3 cursor-pointer transition-all hover:shadow-md",
+              viewMode === 'table1' && "ring-2 ring-green-500",
+              !hasData.table1 && "opacity-50 cursor-not-allowed"
+            )}
+            onClick={() => hasData.table1 && setViewMode('table1')}
+          >
+            <div className="mb-1 text-xs text-muted-foreground">종가매매 1</div>
+            <div className="text-xl font-bold text-green-500">{table1Data.length}</div>
+          </Card>
+          <Card
+            className={cn(
+              "p-3 cursor-pointer transition-all hover:shadow-md",
+              viewMode === 'table2' && "ring-2 ring-blue-500",
+              !hasData.table2 && "opacity-50 cursor-not-allowed"
+            )}
+            onClick={() => hasData.table2 && setViewMode('table2')}
+          >
+            <div className="mb-1 text-xs text-muted-foreground">종가매매 2</div>
+            <div className="text-xl font-bold text-blue-500">{table2Data.length}</div>
+          </Card>
+          <Card
+            className={cn(
+              "p-3 cursor-pointer transition-all hover:shadow-md",
+              viewMode === 'table3' && "ring-2 ring-purple-500",
+              !hasData.table3 && "opacity-50 cursor-not-allowed"
+            )}
+            onClick={() => hasData.table3 && setViewMode('table3')}
+          >
+            <div className="mb-1 text-xs text-muted-foreground">종가매매 3</div>
+            <div className="text-xl font-bold text-purple-500">{table3Data.length}</div>
+          </Card>
+        </div>
+
+        {loading ? (
+          <div className="text-center py-12 text-muted-foreground">
+            데이터를 불러오는 중...
+          </div>
+        ) : totalStocks === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            선택한 날짜({format(selectedDate, "PPP", { locale: ko })})에 데이터가 없습니다.
+          </div>
+        ) : (
+          <>
+            {/* All Tables View */}
+            {viewMode === 'all' && (
+              <div className="grid gap-6 lg:grid-cols-3">
+                {/* Table 1 */}
+                {hasData.table1 && (
+                  <Card className="p-4">
+                    <h3 className="mb-4 text-lg font-semibold">종가매매 1</h3>
+                    <p className="mb-3 text-xs text-muted-foreground">
+                      {table1Data[0]?.select_reason || '선정 종목'}
+                    </p>
+                    <div className="overflow-x-auto rounded-lg border border-border/40">
+                      <table className="w-full">
+                        <thead className="bg-muted/50">
+                          <tr>
+                            <th className="py-2 px-4 text-left text-xs font-medium">종목명</th>
+                            <th className="py-2 px-4 text-right text-xs font-medium">종가</th>
+                            <th className="py-2 px-4 text-right text-xs font-medium">시가</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {table1Data.map((stock) => (
+                            <StockRow key={stock.stock_code} stock={stock} />
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </Card>
+                )}
+
+                {/* Table 2 */}
+                {hasData.table2 && (
+                  <Card className="p-4">
+                    <h3 className="mb-4 text-lg font-semibold">종가매매 2</h3>
+                    <p className="mb-3 text-xs text-muted-foreground">
+                      {table2Data[0]?.trading_amount_category || '거래대금 기준'}
+                    </p>
+                    <div className="overflow-x-auto rounded-lg border border-border/40">
+                      <table className="w-full">
+                        <thead className="bg-muted/50">
+                          <tr>
+                            <th className="py-2 px-4 text-left text-xs font-medium">종목명</th>
+                            <th className="py-2 px-4 text-right text-xs font-medium">종가</th>
+                            <th className="py-2 px-4 text-right text-xs font-medium">시가</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {table2Data.map((stock) => (
+                            <StockRow key={stock.stock_code} stock={stock} showPrevData />
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </Card>
+                )}
+
+                {/* Table 3 */}
+                {hasData.table3 && (
+                  <Card className="p-4">
+                    <h3 className="mb-4 text-lg font-semibold">종가매매 3</h3>
+                    <p className="mb-3 text-xs text-muted-foreground">
+                      {table3Data[0]?.trading_amount_category || '거래대금 기준'}
+                    </p>
+                    <div className="overflow-x-auto rounded-lg border border-border/40">
+                      <table className="w-full">
+                        <thead className="bg-muted/50">
+                          <tr>
+                            <th className="py-2 px-4 text-left text-xs font-medium">종목명</th>
+                            <th className="py-2 px-4 text-right text-xs font-medium">종가</th>
+                            <th className="py-2 px-4 text-right text-xs font-medium">시가</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {table3Data.map((stock) => (
+                            <StockRow key={stock.stock_code} stock={stock} showPrevData />
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </Card>
+                )}
+              </div>
+            )}
+
+            {/* Detailed Table 1 View */}
+            {viewMode === 'table1' && (
+              <DetailedTableView data={table1Data} tableNumber={1} />
+            )}
+
+            {/* Detailed Table 2 View */}
+            {viewMode === 'table2' && (
+              <DetailedTableView data={table2Data} tableNumber={2} />
+            )}
+
+            {/* Detailed Table 3 View */}
+            {viewMode === 'table3' && (
+              <DetailedTableView data={table3Data} tableNumber={3} />
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  )
+}

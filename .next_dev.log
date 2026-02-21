@@ -1,0 +1,651 @@
+
+> my-v0-project@0.1.0 dev
+> next dev -p 13227
+
+   ▲ Next.js 15.5.6
+   - Local:        http://localhost:13227
+   - Network:      http://192.0.0.2:13227
+   - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Ready in 1451ms
+ ○ Compiling /api/market-indices ...
+ ✓ Compiled /api/market-indices in 835ms (299 modules)
+Market Indices API Error: error: relation "kis_major_market_index" does not exist
+    at async GET (app/api/market-indices/route.ts:13:52)
+  11 |
+  12 |     // Parallelize queries for better performance, direct SQL
+> 13 |     const [kospiRes, kosdaqRes, majorIndicesRes] = await Promise.all([
+     |                                                    ^
+  14 |       // KOSPI
+  15 |       pool.query(`
+  16 |         SELECT date, closing_price  {
+  length: 121,
+  severity: 'ERROR',
+  code: '42P01',
+  detail: undefined,
+  hint: undefined,
+  position: '49',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '1449',
+  routine: 'parserOpenTable'
+}
+ GET /api/market-indices 500 in 1227ms
+ ✓ Compiled /api/hot-sectors in 63ms (301 modules)
+Hot Sectors API Exception: error: relation "vsl_anly_stocks_price_subindex01" does not exist
+    at async GET (app/api/hot-sectors/route.ts:23:28)
+  21 |
+  22 |         // 1. Get exact Start and End trading days using direct query
+> 23 |         const datesQuery = await pool.query(`
+     |                            ^
+  24 |             SELECT 
+  25 |                 (SELECT date FROM vsl_anly_stocks_price_subindex01 WHERE date <= $1 ORDER BY date DESC LIMIT 1) as end_date,
+  26 |                 (SELECT date FROM vsl_anly_stocks_price_subindex01 WHERE date >= $2 ORDER BY date ASC LIMIT 1) as start_date {
+  length: 131,
+  severity: 'ERROR',
+  code: '42P01',
+  detail: undefined,
+  hint: undefined,
+  position: '56',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '1449',
+  routine: 'parserOpenTable'
+}
+ GET /api/hot-sectors 500 in 315ms
+ ✓ Compiled /api/exchange-rates in 56ms (303 modules)
+Exchange Rates API Error: error: relation "ecos_currency_all" does not exist
+    at async GET (app/api/exchange-rates/route.ts:11:27)
+   9 |
+  10 |         // 1. Fetch dates directly via pool
+> 11 |         const dateQuery = await pool.query(`
+     |                           ^
+  12 |             SELECT date 
+  13 |             FROM ecos_currency_all 
+  14 |             WHERE item_name1 = '원/미국달러(매매기준율)'  {
+  length: 116,
+  severity: 'ERROR',
+  code: '42P01',
+  detail: undefined,
+  hint: undefined,
+  position: '44',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '1449',
+  routine: 'parserOpenTable'
+}
+ GET /api/exchange-rates 500 in 284ms
+ ✓ Compiled in 99ms (109 modules)
+ ✓ Compiled in 57ms (109 modules)
+ ✓ Compiled in 37ms (109 modules)
+Market Indices API Error: error: relation "kis_major_market_index" does not exist
+    at async GET (app/api/market-indices/route.ts:13:52)
+  11 |
+  12 |     // Parallelize queries for better performance, direct SQL
+> 13 |     const [kospiRes, kosdaqRes, majorIndicesRes] = await Promise.all([
+     |                                                    ^
+  14 |       // KOSPI
+  15 |       pool.query(`
+  16 |         SELECT date, closing_price  {
+  length: 121,
+  severity: 'ERROR',
+  code: '42P01',
+  detail: undefined,
+  hint: undefined,
+  position: '49',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '1449',
+  routine: 'parserOpenTable'
+}
+ GET /api/market-indices 500 in 272ms
+Hot Sectors API Exception: error: relation "remote_visual.vsl_anly_stocks_price_subindex01" does not exist
+    at async GET (app/api/hot-sectors/route.ts:23:28)
+  21 |
+  22 |         // 1. Get exact Start and End trading days using direct query
+> 23 |         const datesQuery = await pool.query(`
+     |                            ^
+  24 |             SELECT 
+  25 |                 (SELECT date FROM remote_visual.vsl_anly_stocks_price_subindex01 WHERE date <= $1 ORDER BY date DESC LIMIT 1) as end_date,
+  26 |                 (SELECT date FROM remote_visual.vsl_anly_stocks_price_subindex01 WHERE date >= $2 ORDER BY date ASC LIMIT 1) as start_date {
+  length: 145,
+  severity: 'ERROR',
+  code: '42P01',
+  detail: undefined,
+  hint: undefined,
+  position: '56',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '1428',
+  routine: 'parserOpenTable'
+}
+ GET /api/hot-sectors 500 in 253ms
+Exchange Rates API Error: error: relation "remote_market.ecos_currency_all" does not exist
+    at async GET (app/api/exchange-rates/route.ts:11:27)
+   9 |
+  10 |         // 1. Fetch dates directly via pool
+> 11 |         const dateQuery = await pool.query(`
+     |                           ^
+  12 |             SELECT date 
+  13 |             FROM remote_market.ecos_currency_all 
+  14 |             WHERE item_name1 = '원/미국달러(매매기준율)'  {
+  length: 130,
+  severity: 'ERROR',
+  code: '42P01',
+  detail: undefined,
+  hint: undefined,
+  position: '44',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '1428',
+  routine: 'parserOpenTable'
+}
+ GET /api/exchange-rates 500 in 219ms
+ ✓ Compiled in 330ms (145 modules)
+ ✓ Compiled in 46ms (145 modules)
+ ✓ Compiled in 81ms (145 modules)
+ ✓ Compiled in 38ms (145 modules)
+ GET /api/market-indices 200 in 884ms
+ GET /api/exchange-rates 200 in 575ms
+Hot Sectors: Analyzing from 2025-11-24 to 2026-02-20
+ GET /api/hot-sectors 200 in 3679ms
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard/sectors in 6.1s (4141 modules)
+ GET /dashboard/stock/001060 200 in 4385ms
+ ○ Compiling /api/stocks/[symbol] ...
+ ✓ Compiled /api/stocks/[symbol] in 1421ms (4199 modules)
+ GET /dashboard 200 in 67ms
+Error: Route "/api/stocks/[symbol]" used `params.symbol`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/stocks/[symbol]/route.ts:10:17)
+   8 | ) {
+   9 |     try {
+> 10 |         const { symbol } = params
+     |                 ^
+  11 |
+  12 |         // Create client for remote_company schema
+  13 |         const remoteCompany = queryRemoteSchema('remote_company')
+ ✓ Compiled /api/exchange-rates in 425ms (2203 modules)
+ ✓ Compiled (2207 modules)
+ GET /api/stocks/001060 200 in 2530ms
+ ✓ Compiled /api/stocks/[symbol]/prices in 272ms (4207 modules)
+ GET /api/exchange-rates 200 in 1292ms
+Error: Route "/api/stocks/[symbol]/prices" used `params.symbol`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/stocks/[symbol]/prices/route.ts:10:17)
+   8 | ) {
+   9 |     try {
+> 10 |         const { symbol } = params
+     |                 ^
+  11 |         const { searchParams } = new URL(request.url)
+  12 |         const period = searchParams.get('period') || 'D'
+  13 |         const limit = parseInt(searchParams.get('limit') || '60')
+ GET /api/market-indices 200 in 1433ms
+Hot Sectors: Analyzing from 2025-11-24 to 2026-02-20
+ GET /api/exchange-rates 200 in 605ms
+ GET /api/market-indices 200 in 769ms
+ GET /api/stocks/001060/prices?limit=60 200 in 2001ms
+ ✓ Compiled /api/stocks/[symbol]/financials in 304ms (4209 modules)
+Error: Route "/api/stocks/[symbol]/financials" used `params.symbol`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/stocks/[symbol]/financials/route.ts:10:17)
+   8 | ) {
+   9 |     try {
+> 10 |         const { symbol } = params
+     |                 ^
+  11 |
+  12 |         // Create client for remote_company schema
+  13 |         const remoteCompany = queryRemoteSchema('remote_company')
+ GET /api/hot-sectors 200 in 3712ms
+ GET /api/stocks/001060/financials 200 in 1574ms
+Hot Sectors: Analyzing from 2025-11-24 to 2026-02-20
+ ✓ Compiled /api/stocks/[symbol]/company-info in 276ms (4211 modules)
+ GET /dashboard/sectors 200 in 60ms
+Error: Route "/api/stocks/[symbol]/company-info" used `params.symbol`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at GET (app/api/stocks/[symbol]/company-info/route.ts:9:27)
+   7 | ) {
+   8 |   try {
+>  9 |     const symbol = params.symbol
+     |                           ^
+  10 |     const remoteCompany = queryRemoteSchema('remote_company')
+  11 |
+  12 |     // 1. Get info from kis_kospi_info or kis_kosdaq_info
+ ✓ Compiled /api/sectors in 337ms (4213 modules)
+ GET /api/hot-sectors 200 in 3044ms
+ GET /api/sectors 200 in 2400ms
+ ✓ Compiled /api/sectors/[name] in 272ms (4215 modules)
+ GET /api/stocks/001060/company-info 200 in 3622ms
+ ✓ Compiled /api/stocks/[symbol]/financial-summary in 261ms (4217 modules)
+ GET /api/stocks/001060/financial-summary 200 in 1224ms
+ ✓ Compiled /api/stocks/[symbol]/investor-trading in 276ms (4219 modules)
+ GET /api/sectors/%EC%A0%9C%EC%95%BD 200 in 2519ms
+KOSPI lookup result: {
+  error: null,
+  data: { koreanname: 'JW중외제약' },
+  count: null,
+  status: 200,
+  statusText: 'OK'
+}
+Found stock name: JW중외제약 for symbol: 001060
+Querying investor data from 2026-01-22 to 2026-02-21
+Investor data query result: { error: null, dataCount: 200, stockName: 'JW중외제약' }
+ GET /api/stocks/001060/investor-trading 200 in 1588ms
+ ✓ Compiled /api/stocks/[symbol]/network in 285ms (4221 modules)
+ GET /api/stocks/001060/network 200 in 793ms
+ GET /dashboard 200 in 72ms
+ GET /api/market-indices 200 in 461ms
+ GET /api/exchange-rates 200 in 602ms
+Hot Sectors: Analyzing from 2025-11-24 to 2026-02-20
+ GET /api/market-indices 200 in 407ms
+ GET /api/exchange-rates 200 in 576ms
+ GET /api/hot-sectors 200 in 2737ms
+Hot Sectors: Analyzing from 2025-11-24 to 2026-02-20
+ GET /dashboard/sectors 200 in 49ms
+ GET /api/hot-sectors 200 in 2772ms
+ GET /dashboard 200 in 31ms
+ GET /api/market-indices 200 in 490ms
+ GET /api/sectors 200 in 2011ms
+Hot Sectors: Analyzing from 2025-11-24 to 2026-02-20
+ GET /api/market-indices 200 in 412ms
+ GET /api/exchange-rates 200 in 943ms
+ GET /api/exchange-rates 200 in 557ms
+ GET /api/sectors/%EC%A0%9C%EC%95%BD 200 in 2093ms
+ GET /api/hot-sectors 200 in 2900ms
+Hot Sectors: Analyzing from 2025-11-24 to 2026-02-20
+ GET /api/hot-sectors 200 in 2617ms
+ ✓ Compiled in 718ms (4235 modules)
+ GET /dashboard 200 in 54ms
+ ✓ Compiled in 330ms (2506 modules)
+ GET /dashboard 200 in 159ms
+ ✓ Compiled in 228ms (2012 modules)
+ GET /dashboard 200 in 14ms
+ ✓ Compiled in 162ms (2012 modules)
+ GET /dashboard 200 in 17ms
+ ✓ Compiled in 130ms (2012 modules)
+ GET /dashboard 200 in 15ms
+ ✓ Compiled /api/market-indices in 66ms (516 modules)
+ GET /dashboard 200 in 142ms
+ GET /api/market-indices 200 in 465ms
+ ✓ Compiled /api/hot-sectors in 94ms (518 modules)
+ GET /dashboard 200 in 84ms
+Hot Sectors: Analyzing from Fri Nov 21 2025 00:00:00 GMT+0900 (Korean Standard Time) to Fri Feb 20 2026 00:00:00 GMT+0900 (Korean Standard Time)
+Hot Sectors API Exception: TypeError: a.date.localeCompare is not a function
+    at eval (app/api/hot-sectors/route.ts:61:62)
+    at Array.sort (<anonymous>)
+    at GET (app/api/hot-sectors/route.ts:61:40)
+  59 |             if (stockPrices.length < 2) continue
+  60 |
+> 61 |             const sorted = stockPrices.sort((a, b) => a.date.localeCompare(b.date))
+     |                                                              ^
+  62 |
+  63 |             const first = sorted[0]
+  64 |             const last = sorted[sorted.length - 1]
+ GET /api/hot-sectors 500 in 665ms
+ ✓ Compiled /api/exchange-rates in 160ms (520 modules)
+ GET /dashboard 200 in 66ms
+ GET /api/exchange-rates 200 in 471ms
+ ✓ Compiled in 351ms (2532 modules)
+ GET /dashboard 200 in 105ms
+ ✓ Compiled in 260ms (2532 modules)
+ GET /dashboard 200 in 61ms
+ ✓ Compiled in 296ms (2532 modules)
+ GET /dashboard 200 in 91ms
+ GET /api/market-indices 200 in 302ms
+Hot Sectors: Analyzing from 2025-11-20 to 2026-02-19
+ GET /api/hot-sectors 200 in 222ms
+ GET /api/exchange-rates 200 in 176ms
+ ✓ Compiled in 407ms (2532 modules)
+ GET /dashboard 200 in 181ms
+ GET /api/exchange-rates 200 in 320ms
+ ✓ Compiled in 426ms (2532 modules)
+ GET /dashboard 200 in 79ms
+EXCHANGE DEBUG: uniqueDates= [ 2026-02-19T15:00:00.000Z, 2026-02-18T15:00:00.000Z ]
+EXCHANGE DEBUG: rates count= 8
+EXCHANGE DEBUG: sample rate= {
+  date: '2026-02-18',
+  item_name1: '원/미국달러(매매기준율)',
+  data_value: '1443.10'
+}
+ GET /api/exchange-rates 200 in 276ms
+ ✓ Compiled in 301ms (2532 modules)
+ GET /dashboard 200 in 140ms
+EXCHANGE DEBUG: uniqueDates= [
+  '2026-02-19',
+  '2026-02-18',
+  '2026-02-12',
+  '2026-01-19',
+  '2025-08-19',
+  '2025-02-19'
+]
+EXCHANGE DEBUG: rates count= 20
+EXCHANGE DEBUG: sample rate= {
+  date: '2025-02-18',
+  item_name1: '원/미국달러(매매기준율)',
+  data_value: '1443.90'
+}
+ GET /api/exchange-rates 200 in 299ms
+EXCHANGE DEBUG: uniqueDates= [
+  '2026-02-19',
+  '2026-02-18',
+  '2026-02-12',
+  '2026-01-19',
+  '2025-08-19',
+  '2025-02-19'
+]
+EXCHANGE DEBUG: rates count= 20
+EXCHANGE DEBUG: sample rate= {
+  date: '2025-02-18',
+  item_name1: '원/미국달러(매매기준율)',
+  data_value: '1443.90'
+}
+ GET /api/exchange-rates 200 in 146ms
+ ✓ Compiled in 512ms (2528 modules)
+ GET /dashboard 200 in 71ms
+Exchange Rates API Error: ReferenceError: uniqueDates is not defined
+    at GET (app/api/exchange-rates/route.ts:72:53)
+  70 |         }));
+  71 |
+> 72 |         console.log("EXCHANGE DEBUG: uniqueDates=", uniqueDates);
+     |                                                     ^
+  73 |         console.log("EXCHANGE DEBUG: rates count=", rates.length);
+  74 |         if (rates.length > 0) console.log("EXCHANGE DEBUG: sample rate=", rates[0]);
+  75 |
+ GET /api/exchange-rates 500 in 357ms
+ ✓ Compiled in 263ms (2528 modules)
+ GET /dashboard 200 in 95ms
+ GET /api/exchange-rates 200 in 360ms
+ ✓ Compiled in 318ms (2528 modules)
+ GET /dashboard 200 in 77ms
+ GET /api/exchange-rates 200 in 285ms
+ ✓ Compiled in 243ms (2528 modules)
+ GET /dashboard 200 in 95ms
+ GET /api/exchange-rates 200 in 292ms
+ ✓ Compiled in 425ms (2528 modules)
+ GET /dashboard 200 in 87ms
+ GET /api/exchange-rates 200 in 288ms
+ GET /dashboard 200 in 300ms
+ ✓ Compiled /api/exchange-rates in 358ms (516 modules)
+ ✓ Compiled (520 modules)
+Hot Sectors: Analyzing from 2025-11-20 to 2026-02-19
+ GET /api/market-indices 200 in 852ms
+ GET /api/exchange-rates 200 in 853ms
+ GET /api/hot-sectors 200 in 1023ms
+ GET /dashboard/sectors 200 in 88ms
+ ✓ Compiled /api/sectors in 354ms (552 modules)
+ GET /dashboard 200 in 78ms
+ ✓ Compiled /api/hot-sectors in 72ms (557 modules)
+ ✓ Compiled (561 modules)
+Hot Sectors: Analyzing from 2025-11-20 to 2026-02-19
+ GET /api/market-indices 200 in 446ms
+ GET /api/exchange-rates 200 in 447ms
+ GET /api/market-indices 200 in 93ms
+ GET /api/exchange-rates 200 in 127ms
+ GET /api/hot-sectors 200 in 690ms
+ GET /api/sectors 200 in 4350ms
+Hot Sectors: Analyzing from 2025-11-20 to 2026-02-19
+ ✓ Compiled /api/sectors/[name] in 132ms (563 modules)
+ GET /api/hot-sectors 200 in 325ms
+ GET /api/sectors/%EC%A0%9C%EC%95%BD 200 in 2243ms
+ ✓ Compiled in 735ms (2012 modules)
+ GET /dashboard 200 in 50ms
+ ✓ Compiled in 176ms (2012 modules)
+ GET /dashboard 200 in 17ms
+ ✓ Compiled in 151ms (2012 modules)
+ GET /dashboard 200 in 17ms
+ ✓ Compiled in 158ms (2012 modules)
+ GET /dashboard 200 in 16ms
+ ✓ Compiled in 339ms (2012 modules)
+ GET /dashboard 200 in 61ms
+ ✓ Compiled in 249ms (2012 modules)
+ GET /dashboard 200 in 14ms
+ ✓ Compiled in 207ms (2012 modules)
+ GET /dashboard 200 in 18ms
+ ✓ Compiled in 152ms (2012 modules)
+ GET /dashboard 200 in 16ms
+ ✓ Compiled in 507ms (2012 modules)
+ ✓ Compiled in 186ms (2012 modules)
+ ✓ Compiled in 498ms (2506 modules)
+ ✓ Compiled in 197ms (2012 modules)
+ ✓ Compiled in 339ms (2012 modules)
+ ✓ Compiled in 215ms (2012 modules)
+ GET /dashboard 200 in 149ms
+ ✓ Compiled /dashboard/value in 326ms (516 modules)
+ ✓ Compiled in 721ms (2007 modules)
+ ⨯ Error: Cannot find module './566.js'
+Require stack:
+- /Users/utaekim/aiProject/finexPjt/.next/server/webpack-runtime.js
+- /Users/utaekim/aiProject/finexPjt/.next/server/app/api/exchange-rates/route.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/require.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/load-components.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/utils.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/swc/options.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/swc/index.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/lib/router-server.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/lib/start-server.js
+    at <unknown> (.next/server/app/api/exchange-rates/route.js:12:6618)
+    at Object.<anonymous> (.next/server/app/api/exchange-rates/route.js:12:6667) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/api/exchange-rates'
+}
+ ⨯ Error: Cannot find module './566.js'
+Require stack:
+- /Users/utaekim/aiProject/finexPjt/.next/server/webpack-runtime.js
+- /Users/utaekim/aiProject/finexPjt/.next/server/app/api/exchange-rates/route.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/require.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/load-components.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/utils.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/swc/options.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/swc/index.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/lib/router-server.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/lib/start-server.js
+    at <unknown> (.next/server/app/api/hot-sectors/route.js:10:1409)
+    at Object.<anonymous> (.next/server/app/api/hot-sectors/route.js:10:1458) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/api/hot-sectors'
+}
+ ⨯ Error: Cannot find module './566.js'
+Require stack:
+- /Users/utaekim/aiProject/finexPjt/.next/server/webpack-runtime.js
+- /Users/utaekim/aiProject/finexPjt/.next/server/app/api/exchange-rates/route.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/require.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/load-components.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/utils.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/swc/options.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/swc/index.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/lib/router-server.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/lib/start-server.js
+    at <unknown> (.next/server/app/api/market-indices/route.js:16:7349)
+    at Object.<anonymous> (.next/server/app/api/market-indices/route.js:16:7398) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/api/market-indices'
+}
+ ⨯ Error: Cannot find module './566.js'
+Require stack:
+- /Users/utaekim/aiProject/finexPjt/.next/server/webpack-runtime.js
+- /Users/utaekim/aiProject/finexPjt/.next/server/app/api/exchange-rates/route.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/require.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/load-components.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/utils.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/swc/options.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/swc/index.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/analysis/parse-module.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/build/analysis/get-page-static-info.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/lib/router-server.js
+- /Users/utaekim/aiProject/finexPjt/node_modules/.pnpm/next@15.5.6_react-dom@19.2.0_react@19.2.0__react@19.2.0/node_modules/next/dist/server/lib/start-server.js
+    at <unknown> (.next/server/app/dashboard/sectors/page.js:2:7508)
+    at Object.<anonymous> (.next/server/app/dashboard/sectors/page.js:2:7574) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array],
+  page: '/dashboard/sectors'
+}
+ ⨯ Error: ENOENT: no such file or directory, open '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js'
+    at <unknown> (.next/server/app/dashboard/momentum/page.js:443:47)
+    at Object.<anonymous> (.next/server/app/dashboard/momentum/page.js:446:3) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js',
+  page: '/dashboard/momentum'
+}
+ ⨯ Error: ENOENT: no such file or directory, open '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js'
+    at <unknown> (.next/server/app/dashboard/value/page.js:454:47)
+    at Object.<anonymous> (.next/server/app/dashboard/value/page.js:457:3) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js',
+  page: '/dashboard/value'
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1040ms (2887 modules)
+ GET /api/exchange-rates 500 in 2942ms
+ GET /api/hot-sectors 500 in 2944ms
+ GET /api/market-indices 500 in 2945ms
+ GET /dashboard/sectors 500 in 2909ms
+ GET /dashboard/momentum 500 in 2909ms
+ GET /dashboard/value 500 in 2909ms
+ ○ Compiling /dashboard/technical ...
+ ✓ Compiled /dashboard/technical in 633ms (2941 modules)
+ ⨯ Error: ENOENT: no such file or directory, open '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js'
+    at <unknown> (.next/server/app/dashboard/dividend/page.js:454:47)
+    at Object.<anonymous> (.next/server/app/dashboard/dividend/page.js:457:3) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js',
+  page: '/dashboard/dividend'
+}
+ ⨯ Error: ENOENT: no such file or directory, open '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js'
+    at <unknown> (.next/server/app/dashboard/portfolio/page.js:421:47)
+    at Object.<anonymous> (.next/server/app/dashboard/portfolio/page.js:424:3) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js',
+  page: '/dashboard/portfolio'
+}
+ ⨯ Error: ENOENT: no such file or directory, open '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js'
+    at <unknown> (.next/server/app/dashboard/settings/page.js:454:47)
+    at Object.<anonymous> (.next/server/app/dashboard/settings/page.js:457:3) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js',
+  page: '/dashboard/settings'
+}
+ ⨯ Error: ENOENT: no such file or directory, open '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js'
+    at <unknown> (.next/server/app/dashboard/technical/page.js:465:47)
+    at Object.<anonymous> (.next/server/app/dashboard/technical/page.js:468:3) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js',
+  page: '/dashboard/technical'
+}
+ ⨯ Error: ENOENT: no such file or directory, open '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js'
+    at <unknown> (.next/server/app/dashboard/growth/page.js:454:47)
+    at Object.<anonymous> (.next/server/app/dashboard/growth/page.js:457:3) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js',
+  page: '/dashboard/growth'
+}
+ GET /dashboard/dividend 500 in 1021ms
+ GET /dashboard/portfolio 500 in 1022ms
+ GET /dashboard/settings 500 in 1022ms
+ GET /dashboard/technical 500 in 1022ms
+ GET /dashboard/growth 500 in 1028ms
+ ⨯ Error: ENOENT: no such file or directory, open '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js'
+    at <unknown> (.next/server/app/dashboard/sectors/page.js:432:47)
+    at Object.<anonymous> (.next/server/app/dashboard/sectors/page.js:435:3) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js',
+  page: '/dashboard/sectors'
+}
+ GET /dashboard/sectors 500 in 271ms
+ ⨯ Error: ENOENT: no such file or directory, open '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js'
+    at <unknown> (.next/server/app/dashboard/sectors/page.js:432:47)
+    at Object.<anonymous> (.next/server/app/dashboard/sectors/page.js:435:3) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js',
+  page: '/dashboard/sectors'
+}
+ GET /dashboard/sectors 500 in 260ms
+ ⨯ Error: ENOENT: no such file or directory, open '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js'
+    at <unknown> (.next/server/app/dashboard/page.js:487:47)
+    at Object.<anonymous> (.next/server/app/dashboard/page.js:490:3) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js',
+  page: '/dashboard'
+}
+ GET /dashboard 500 in 285ms
+ ⨯ Error: ENOENT: no such file or directory, open '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js'
+    at <unknown> (.next/server/app/dashboard/sectors/page.js:432:47)
+    at Object.<anonymous> (.next/server/app/dashboard/sectors/page.js:435:3) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/Users/utaekim/aiProject/finexPjt/.next/server/vendor-chunks/tslib@2.8.1.js',
+  page: '/dashboard/sectors'
+}
+ GET /dashboard/sectors 500 in 265ms
