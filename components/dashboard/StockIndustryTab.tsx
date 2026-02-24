@@ -177,7 +177,7 @@ export default function StockIndustryTab({ symbol }: StockIndustryTabProps) {
                                             data={(group as IndustryGroup).stocks.map(s => ({
                                                 ...s,
                                                 name: s.stock_name || s.stock_code,
-                                                value: s.revenue
+                                                value: (s.revenue && s.revenue > 0) ? s.revenue : 1
                                             }))}
                                             dataKey="value"
                                             nameKey="name"

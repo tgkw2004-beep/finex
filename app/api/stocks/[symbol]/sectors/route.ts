@@ -26,7 +26,7 @@ export async function GET(
         // 1. Get WICS classification for the current symbol
         const mySectorRes = await pool.query(`
             SELECT wics_name1, wics_name2, wics_name3
-            FROM remote_visual.vsl_krx_stocks_fundamental_info
+            FROM visual.vsl_krx_stocks_fundamental_info
             WHERE stock_code = $1
             LIMIT 1
         `, [symbol])
@@ -43,7 +43,7 @@ export async function GET(
 
             const res = await pool.query(`
                 SELECT stock_code, stock_name
-                FROM remote_visual.vsl_krx_stocks_fundamental_info
+                FROM visual.vsl_krx_stocks_fundamental_info
                 WHERE ${schemaLevel} = $1
                 LIMIT 200
             `, [sectorName])
