@@ -115,8 +115,8 @@ export async function GET(
         let holdings: any[] = []
         if (investorNames.length > 0) {
             const holdingsRes = await pool.query(`
-                SELECT rcept_dt, corp_code, corp_name, repror, stkrt
-                FROM public.major_stock_holdings
+                SELECT rcept_dt, corp_code, corp_name, repror, stkqy AS stkrt
+                FROM company.dart_major_stock
                 WHERE repror = ANY($1)
                 ORDER BY rcept_dt DESC
             `, [investorNames])

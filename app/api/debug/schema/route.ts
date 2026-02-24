@@ -3,22 +3,19 @@ import pool from '@/lib/db'
 
 export async function GET() {
     try {
-        let holdingSample = null
-        let holdingError = null
+        // Find holding-related tables across all schemas
+        const tablesRes = await pool.query(`
+            SELECT column_name, data_type 
+            FROM information_schema.columns 
+            WHERE table_schema='company' AND table_name='dart_major_stock'
+            ORDER BY ordinal_position
+        `)
 
-        try {
-            // 1. Check major_stock_holdings in remote_company
-            const res = await pool.query('SELECT * FROM company.major_stock_holdings LIMIT 1')
-            holdingSample = res.rows[0]
-        } catch (e: any) {
-            holdingError = e.message
-        }
+        const sampleRes = await pool.query(`SELECT * FROM company.dart_major_stock LIMIT 2`)
 
         let companySample = null
         let companyError = null
-
         try {
-            // 2. Check master_company_list for Industry info
             const res2 = await pool.query('SELECT * FROM company.master_company_list LIMIT 1')
             companySample = res2.rows[0]
         } catch (e: any) {
@@ -26,10 +23,8 @@ export async function GET() {
         }
 
         return NextResponse.json({
-            major_stock_holdings_source: 'remote_company',
-            major_stock_holdings_sample: holdingSample,
-            holding_error: holdingError,
-
+            columns: tablesRes.rows,
+            sample: sampleRes.rows,
             master_company_sample: companySample,
             company_error: companyError
         })
