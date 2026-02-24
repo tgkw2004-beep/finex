@@ -11,7 +11,7 @@ export async function GET(
         // 1. Get Target Company's WICS info
         const targetRes = await pool.query(`
             SELECT stock_code, stock_name, wics_name1, wics_name2, wics_name3
-            FROM remote_company.master_company_list
+            FROM company.master_company_list
             WHERE stock_code = $1
             LIMIT 1
         `, [symbol])
@@ -33,7 +33,7 @@ export async function GET(
         // 2. Fetch Peers for the same large sector
         const peersRes = await pool.query(`
             SELECT stock_code, stock_name, wics_name1, wics_name2, wics_name3, revenue
-            FROM remote_company.master_company_list
+            FROM company.master_company_list
             WHERE wics_name1 = $1
             LIMIT 1000
         `, [wics_name1])
@@ -43,23 +43,32 @@ export async function GET(
 
         // 3. Get latest available date from OHLCV
         const latestDateRes = await pool.query(`
-            SELECT date FROM public.krx_stocks_ohlcv
+            SELECT date FROM company.krx_stocks_ohlcv
             ORDER BY date DESC
             LIMIT 1
         `)
         const targetDate = latestDateRes.rows[0]?.date || new Date().toISOString().split('T')[0]
 
-        // 4. Fetch OHLCV for this date
+        // 4. Fetch OHLCV for this date and previous date (to calc change_rate)
         let priceMap = new Map()
         if (peerCodes.length > 0) {
             const priceRes = await pool.query(`
-                SELECT stock_code, close, change_rate
-                FROM public.krx_stocks_ohlcv
-                WHERE date = $1 AND stock_code = ANY($2)
+                SELECT t.code, t.close,
+                       CASE WHEN p.close > 0 
+                            THEN ROUND(((t.close - p.close)::numeric / p.close * 100)::numeric, 2)
+                            ELSE 0 END AS change_rate
+                FROM company.krx_stocks_ohlcv t
+                LEFT JOIN company.krx_stocks_ohlcv p
+                  ON t.code = p.code
+                  AND p.date = (
+                      SELECT MAX(date) FROM company.krx_stocks_ohlcv
+                      WHERE code = t.code AND date < $1
+                  )
+                WHERE t.date = $1 AND t.code = ANY($2)
             `, [targetDate, peerCodes])
 
             priceRes.rows.forEach((p: any) => {
-                priceMap.set(p.stock_code, p)
+                priceMap.set(p.code, p)
             })
         }
 
@@ -75,7 +84,7 @@ export async function GET(
                         stock_name: p.stock_name,
                         revenue: p.revenue || 0,
                         price: price?.close || 0,
-                        change_rate: price?.change_rate || 0,
+                        change_rate: price ? Number(price.change_rate) : 0,
                         wics_name1: p.wics_name1,
                         wics_name2: p.wics_name2,
                         wics_name3: p.wics_name3

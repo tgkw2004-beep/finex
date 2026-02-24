@@ -7,11 +7,11 @@ export async function GET() {
         const tablesRes = await pool.query(`
             SELECT column_name, data_type 
             FROM information_schema.columns 
-            WHERE table_schema='company' AND table_name='dart_major_stock'
+            WHERE table_schema='company' AND table_name='krx_stocks_ohlcv'
             ORDER BY ordinal_position
         `)
 
-        const sampleRes = await pool.query(`SELECT * FROM company.dart_major_stock LIMIT 2`)
+        const sampleRes = await pool.query(`SELECT * FROM company.krx_stocks_ohlcv LIMIT 1`)
 
         let companySample = null
         let companyError = null

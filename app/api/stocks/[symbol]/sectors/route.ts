@@ -80,7 +80,7 @@ export async function GET(
         // 2. Fetch Market Cap
         const capRes = await pool.query(`
             SELECT code, cap, date
-            FROM remote_company.krx_stocks_cap
+            FROM company.krx_stocks_cap
             WHERE code = ANY($1)
             ORDER BY date DESC
             LIMIT $2
@@ -96,7 +96,7 @@ export async function GET(
         // 3. Fetch Price Info
         const priceRes = await pool.query(`
             SELECT code, close, date
-            FROM remote_company.krx_stocks_ohlcv
+            FROM company.krx_stocks_ohlcv
             WHERE code = ANY($1)
             ORDER BY date DESC
             LIMIT $2
@@ -133,7 +133,7 @@ export async function GET(
         // 4. Fetch Names for all codes
         const nameRes = await pool.query(`
             SELECT stock_code, stock_name
-            FROM remote_company.master_company_list
+            FROM company.master_company_list
             WHERE stock_code = ANY($1)
         `, [codeArray])
 
