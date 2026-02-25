@@ -14,7 +14,7 @@ import { VolumeChart } from "@/components/dashboard/volume-chart"
 import { Minus, Plus } from "lucide-react"
 import type { CompanyInfo } from "@/types/stock"
 import NetworkGraphForce from "@/components/NetworkGraphForceV2"
-import StockThemeTab from "@/components/dashboard/StockThemeTab"
+import StockIndustryThemeTab from "@/components/dashboard/StockIndustryThemeTab"
 import { FinancialBarChart } from "@/components/dashboard/FinancialBarChart"
 
 // Helper to format currency
@@ -645,9 +645,9 @@ export default function StockDetailPage() {
             )}
           </Card>
         </TabsContent>
-        {/* 업종/테마 탭 (Added) */}
+        {/* 업종/테마 탭 */}
         <TabsContent value="theme" className="space-y-4 mt-4">
-          <StockThemeTab symbol={symbol} />
+          <StockIndustryThemeTab symbol={symbol} />
         </TabsContent>
       </Tabs>
     </div >
