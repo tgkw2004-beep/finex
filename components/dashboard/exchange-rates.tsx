@@ -96,8 +96,7 @@ export function ExchangeRates() {
                             <TableHead className="font-semibold text-muted-foreground text-right pr-4">1주</TableHead>
                             <TableHead className="font-semibold text-muted-foreground text-right pr-4">1개월</TableHead>
                             <TableHead className="font-semibold text-muted-foreground text-right pr-4">6개월</TableHead>
-                            <TableHead className="font-semibold text-muted-foreground text-right pr-4">1년</TableHead>
-                            <TableHead className="font-semibold text-muted-foreground text-right pr-6">5년</TableHead>
+                            <TableHead className="font-semibold text-muted-foreground text-right pr-6">1년</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -108,7 +107,6 @@ export function ExchangeRates() {
                                     <TableCell className="hidden md:table-cell"><div className="h-4 w-32 bg-muted rounded"></div></TableCell>
                                     <TableCell><div className="h-4 w-16 bg-muted rounded ml-auto"></div></TableCell>
                                     <TableCell><div className="h-4 w-16 bg-muted rounded ml-auto"></div></TableCell>
-                                    <TableCell><div className="h-4 w-12 bg-muted rounded ml-auto"></div></TableCell>
                                     <TableCell><div className="h-4 w-12 bg-muted rounded ml-auto"></div></TableCell>
                                     <TableCell><div className="h-4 w-12 bg-muted rounded ml-auto"></div></TableCell>
                                     <TableCell><div className="h-4 w-12 bg-muted rounded ml-auto"></div></TableCell>
@@ -147,7 +145,6 @@ export function ExchangeRates() {
                                         {renderPercentCell(rate.monthPct)}
                                         {renderPercentCell(rate.sixMonthPct)}
                                         {renderPercentCell(rate.yearPct)}
-                                        {renderPercentCell(rate.fiveYearPct)}
                                     </TableRow>
                                 )
                             })
