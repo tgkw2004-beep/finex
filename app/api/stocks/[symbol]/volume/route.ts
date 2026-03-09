@@ -5,10 +5,10 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { symbol: string } }
+    { params }: { params: Promise<{ symbol: string }> }
 ) {
     try {
-        const { symbol } = params
+        const { symbol } = await params
         const { searchParams } = new URL(request.url)
         const limit = parseInt(searchParams.get('limit') || '60')
 

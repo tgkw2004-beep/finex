@@ -5,10 +5,10 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { symbol: string } }
+  { params }: { params: Promise<{ symbol: string }> }
 ) {
   try {
-    const symbol = params.symbol
+    const { symbol } = await params
 
     // 1. Get info from kis_kospi_info or kis_kosdaq_info
     const kospiRes = await pool.query(`SELECT * FROM company.kis_kospi_info WHERE shortcode = $1 LIMIT 1`, [symbol])
