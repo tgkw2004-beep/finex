@@ -1,11 +1,11 @@
 "use client"
 
-import StockThemeTab from './StockThemeTab'
+import StockIndustryTab from './StockIndustryTab'
 
 interface StockIndustryThemeTabProps {
     symbol: string
 }
 
 export default function StockIndustryThemeTab({ symbol }: StockIndustryThemeTabProps) {
-    return <StockThemeTab symbol={symbol} />
+    return <StockIndustryTab symbol={symbol} />
 }

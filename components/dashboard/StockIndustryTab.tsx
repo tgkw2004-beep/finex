@@ -198,7 +198,10 @@ export default function StockIndustryTab({ symbol }: StockIndustryTabProps) {
 
                     {/* ── 전체 업종 열지도 ── */}
                     <TabsContent value="heatmap" className="mt-0">
-                        <div className="h-[520px] w-full border rounded-lg overflow-hidden bg-slate-950 relative">
+                        <div
+                            className="w-full border rounded-lg overflow-hidden bg-slate-950 relative"
+                            style={{ height: 'calc(100vh - 350px)', minHeight: '400px' }}
+                        >
                             {sectorData?.sectors?.length ? (
                                 <>
                                     <ResponsiveContainer width="100%" height="100%">
