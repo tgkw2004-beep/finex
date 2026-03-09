@@ -62,16 +62,18 @@ export function HotSectors() {
 
       <div className="grid gap-1.5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
         {sectors.map((sector) => (
-          <Card key={sector.name} className="px-2 py-1 transition-colors hover:bg-accent/50">
-            <div className="flex items-center justify-between gap-1">
-              <span className="font-semibold text-sm truncate" title={sector.name}>{sector.name}</span>
-              <div className="flex items-center gap-0.5 text-green-500 shrink-0">
-                <TrendingUp className="h-3 w-3" />
-                <span className="text-xs font-medium">{sector.change}</span>
+          <Link key={sector.name} href={`/dashboard/sectors?name=${encodeURIComponent(sector.name)}`}>
+            <Card className="px-2 py-1 transition-colors hover:bg-accent/50 cursor-pointer hover:border-primary/50">
+              <div className="flex items-center justify-between gap-1">
+                <span className="font-semibold text-sm truncate" title={sector.name}>{sector.name}</span>
+                <div className="flex items-center gap-0.5 text-green-500 shrink-0">
+                  <TrendingUp className="h-3 w-3" />
+                  <span className="text-xs font-medium">{sector.change}</span>
+                </div>
               </div>
-            </div>
-            <div className="text-xs text-muted-foreground">{sector.stocks}개 종목</div>
-          </Card>
+              <div className="text-xs text-muted-foreground">{sector.stocks}개 종목</div>
+            </Card>
+          </Link>
         ))}
       </div>
     </div>

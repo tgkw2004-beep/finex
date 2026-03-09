@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { useSearchParams } from "next/navigation"
 import { AnalysisHeader } from "@/components/dashboard/analysis-header"
 import { Card } from "@/components/ui/card"
 import { StockTable } from "@/components/dashboard/stock-table"
@@ -27,6 +28,8 @@ interface SectorDetail {
 
 export default function SectorsPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const initialName = searchParams.get('name')
   const initialized = useRef(false)
   const [analyzed, setAnalyzed] = useState(false)
   const [sectors, setSectors] = useState<SectorData[]>([])
@@ -56,9 +59,11 @@ export default function SectorsPage() {
       const data = await res.json()
       if (Array.isArray(data)) {
         setSectors(data)
-        if (data.length > 0) {
-          handleSelectSector(data[0].name)
-        }
+        // URL ?name= 파라미터가 있으면 해당 업종 선택, 없으면 첫 번째 업종
+        const targetName = initialName && data.find((s: SectorData) => s.name === initialName)
+          ? initialName
+          : data[0]?.name
+        if (targetName) handleSelectSector(targetName)
       } else {
         setSectors([])
         console.error("API did not return an array:", data)
