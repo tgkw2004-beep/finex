@@ -183,17 +183,17 @@ export default function PullbackPage() {
 
       {/* 요약 카드 — 원래 내용(라벨 위, 숫자 아래), 패딩만 축소 */}
       <div className="grid gap-3 sm:grid-cols-3">
-        <Card className="p-2">
-          <div className="mb-0.5 text-xs text-muted-foreground">선별 종목 수</div>
-          <div className="text-lg font-bold">{stats.total}개</div>
+        <Card className="px-3 py-1.5">
+          <div className="text-xs text-muted-foreground leading-none">선별 종목 수</div>
+          <div className="text-lg font-bold leading-tight">{stats.total}개</div>
         </Card>
-        <Card className="p-2">
-          <div className="mb-0.5 text-xs text-muted-foreground">대형주 (10%+)</div>
-          <div className="text-lg font-bold text-purple-600">{stats.large}개</div>
+        <Card className="px-3 py-1.5">
+          <div className="text-xs text-muted-foreground leading-none">대형주 (10%+)</div>
+          <div className="text-lg font-bold leading-tight text-purple-600">{stats.large}개</div>
         </Card>
-        <Card className="p-2">
-          <div className="mb-0.5 text-xs text-muted-foreground">중소형 (15%+)</div>
-          <div className="text-lg font-bold text-red-500">{stats.mid}개</div>
+        <Card className="px-3 py-1.5">
+          <div className="text-xs text-muted-foreground leading-none">중소형 (15%+)</div>
+          <div className="text-lg font-bold leading-tight text-red-500">{stats.mid}개</div>
         </Card>
       </div>
 
