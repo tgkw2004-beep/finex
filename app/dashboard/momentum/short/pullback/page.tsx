@@ -53,20 +53,27 @@ export default function PullbackPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [availableDates, setAvailableDates] = useState<Set<string>>(new Set())
   const [page, setPage] = useState(1)
+  const [cardFilter, setCardFilter] = useState<'all' | 'large' | 'mid'>('all')
 
   const selectedDateStr = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : ''
 
-  const filteredData = selectedDateStr
+  const byDate = selectedDateStr
     ? data.filter(r => r["기준봉 일자"] === selectedDateStr)
     : data
+
+  const filteredData = cardFilter === 'large'
+    ? byDate.filter(r => r["선정이유"].includes('대형주'))
+    : cardFilter === 'mid'
+      ? byDate.filter(r => r["선정이유"] === '상승률 15%이상')
+      : byDate
 
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE)
   const pagedData = filteredData.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE)
 
   const stats = {
-    total: filteredData.length,
-    large: filteredData.filter(r => r["선정이유"].includes('대형주')).length,
-    mid: filteredData.filter(r => r["선정이유"] === '상승률 15%이상').length,
+    total: byDate.length,
+    large: byDate.filter(r => r["선정이유"].includes('대형주')).length,
+    mid: byDate.filter(r => r["선정이유"] === '상승률 15%이상').length,
   }
 
   const fetchData = async () => {
@@ -101,6 +108,7 @@ export default function PullbackPage() {
     if (date) {
       setSelectedDate(date)
       setPage(1)
+      setCardFilter('all')
     }
   }
 
@@ -183,15 +191,24 @@ export default function PullbackPage() {
 
       {/* 요약 카드 — 원래 내용(라벨 위, 숫자 아래), 패딩만 축소 */}
       <div className="grid gap-3 sm:grid-cols-3">
-        <Card className="px-3 py-1.5">
+        <Card
+          className={`px-3 py-1.5 cursor-pointer transition-all hover:shadow-md ${cardFilter === 'all' ? 'ring-2 ring-primary' : ''}`}
+          onClick={() => { setCardFilter('all'); setPage(1) }}
+        >
           <div className="text-xs text-muted-foreground leading-none">선별 종목 수</div>
           <div className="text-lg font-bold leading-tight">{stats.total}개</div>
         </Card>
-        <Card className="px-3 py-1.5">
+        <Card
+          className={`px-3 py-1.5 cursor-pointer transition-all hover:shadow-md ${cardFilter === 'large' ? 'ring-2 ring-purple-500' : ''}`}
+          onClick={() => { setCardFilter(cardFilter === 'large' ? 'all' : 'large'); setPage(1) }}
+        >
           <div className="text-xs text-muted-foreground leading-none">대형주 (10%+)</div>
           <div className="text-lg font-bold leading-tight text-purple-600">{stats.large}개</div>
         </Card>
-        <Card className="px-3 py-1.5">
+        <Card
+          className={`px-3 py-1.5 cursor-pointer transition-all hover:shadow-md ${cardFilter === 'mid' ? 'ring-2 ring-red-500' : ''}`}
+          onClick={() => { setCardFilter(cardFilter === 'mid' ? 'all' : 'mid'); setPage(1) }}
+        >
           <div className="text-xs text-muted-foreground leading-none">중소형 (15%+)</div>
           <div className="text-lg font-bold leading-tight text-red-500">{stats.mid}개</div>
         </Card>
