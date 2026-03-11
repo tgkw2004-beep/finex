@@ -68,78 +68,49 @@ export default function StockDetailPage() {
   const [selectedYear, setSelectedYear] = useState<string>('')
   const [investorTradingData, setInvestorTradingData] = useState<any[]>([])
   const [networkData, setNetworkData] = useState<any>({ nodes: [], links: [] })
-  const [loading, setLoading] = useState(true)
+  const [loadingStatic, setLoadingStatic] = useState(true)
+  const [loadingPrice, setLoadingPrice] = useState(true)
+  const loading = loadingStatic || loadingPrice
 
-  // Fetch all data
+  // ── 정적 데이터: symbol 변경 시 한 번만 병렬 fetch ──────────────────────────
   useEffect(() => {
-    const fetchAllData = async () => {
-      if (!symbol) return
+    if (!symbol) return
+    setLoadingStatic(true)
 
-      try {
-        setLoading(true)
-
-        // Fetch company info
-        const companyRes = await fetch(`/api/stocks/${symbol}`)
-        if (companyRes.ok) {
-          const companyData = await companyRes.json()
-          setCompanyInfo(companyData.companyInfo)
-        }
-
-        // Fetch price data
-        const pricesRes = await fetch(`/api/stocks/${symbol}/prices?limit=${rangeCount}`)
-        if (pricesRes.ok) {
-          const pricesData = await pricesRes.json()
-          setPriceData(pricesData.prices || [])
-        }
-
-        // Fetch financial data
-        const financialRes = await fetch(`/api/stocks/${symbol}/financials`)
-        if (financialRes.ok) {
-          const finData = await financialRes.json()
-          setFinancialData(finData.financialData)
-        }
-
-        // Fetch company detail info
-        const companyDetailRes = await fetch(`/api/stocks/${symbol}/company-info`)
-        if (companyDetailRes.ok) {
-          const detailData = await companyDetailRes.json()
-          setCompanyDetailInfo(detailData)
-        }
-
-        // Fetch financial summary
-        const financialSummaryRes = await fetch(`/api/stocks/${symbol}/financial-summary`)
-        if (financialSummaryRes.ok) {
-          const summaryData = await financialSummaryRes.json()
-          setFinancialSummary(summaryData.data || [])
-          setFinancialYears(summaryData.years || [])
-          if (summaryData.years && summaryData.years.length > 0) {
-            setSelectedYear(summaryData.years[0])
-          }
-        }
-
-        // Fetch investor trading data
-        const investorTradingRes = await fetch(`/api/stocks/${symbol}/investor-trading`)
-        if (investorTradingRes.ok) {
-          const investorData = await investorTradingRes.json()
-          setInvestorTradingData(investorData.data || [])
-        }
-
-        // Fetch network data
-        const networkRes = await fetch(`/api/stocks/${symbol}/network`)
-        if (networkRes.ok) {
-          const netData = await networkRes.json()
-          setNetworkData(netData)
-        }
-
-      } catch (error) {
-        console.error('Failed to fetch data:', error)
-      } finally {
-        setLoading(false)
+    Promise.all([
+      fetch(`/api/stocks/${symbol}`).then(r => r.ok ? r.json() : null),
+      fetch(`/api/stocks/${symbol}/financials`).then(r => r.ok ? r.json() : null),
+      fetch(`/api/stocks/${symbol}/company-info`).then(r => r.ok ? r.json() : null),
+      fetch(`/api/stocks/${symbol}/financial-summary`).then(r => r.ok ? r.json() : null),
+      fetch(`/api/stocks/${symbol}/investor-trading`).then(r => r.ok ? r.json() : null),
+      fetch(`/api/stocks/${symbol}/network`).then(r => r.ok ? r.json() : null),
+    ]).then(([company, financial, detail, summary, investor, network]) => {
+      if (company) setCompanyInfo(company.companyInfo)
+      if (financial) setFinancialData(financial.financialData)
+      if (detail) setCompanyDetailInfo(detail)
+      if (summary) {
+        setFinancialSummary(summary.data || [])
+        setFinancialYears(summary.years || [])
+        if (summary.years?.length > 0) setSelectedYear(summary.years[0])
       }
-    }
+      if (investor) setInvestorTradingData(investor.data || [])
+      if (network) setNetworkData(network)
+    }).catch(e => console.error('Failed to fetch static data:', e))
+      .finally(() => setLoadingStatic(false))
+  }, [symbol])
 
-    fetchAllData()
+  // ── 가격 데이터: rangeCount/period 변경 시 별도 fetch ───────────────────────
+  useEffect(() => {
+    if (!symbol) return
+    setLoadingPrice(true)
+
+    fetch(`/api/stocks/${symbol}/prices?limit=${rangeCount}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setPriceData(data.prices || []) })
+      .catch(e => console.error('Failed to fetch prices:', e))
+      .finally(() => setLoadingPrice(false))
   }, [symbol, rangeCount])
+
 
   // Reset range when period changes
   const handlePeriodChange = (period: "D" | "W" | "M" | "Y") => {

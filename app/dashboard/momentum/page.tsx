@@ -9,11 +9,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TrendingDown, BarChart3, LineChart, TrendingUp, Clock } from "lucide-react"
 
 const shortTermStrategies = [
+  { name: "종가매매", href: "/dashboard/momentum/short/closing", icon: Clock, description: "종가 기준 매매 전략" },
   { name: "눌림목", href: "/dashboard/momentum/short/pullback", icon: TrendingDown, description: "상승 후 조정 구간 진입점 포착" },
   { name: "거래량", href: "/dashboard/momentum/short/volume", icon: BarChart3, description: "거래량 급증 종목 탐지" },
   { name: "이동평균", href: "/dashboard/momentum/short/ma", icon: LineChart, description: "이동평균선 돌파 신호" },
   { name: "상승갭", href: "/dashboard/momentum/short/gap", icon: TrendingUp, description: "갭 상승 출현 종목" },
-  { name: "종가매매", href: "/dashboard/momentum/short/closing", icon: Clock, description: "종가 기준 매매 전략" },
 ]
 
 const swingStrategies = [

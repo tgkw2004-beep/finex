@@ -51,7 +51,10 @@ export default function ClosingPage() {
         if (response.ok) {
           const data = await response.json()
           if (data.latestDate) {
-            setSelectedDate(new Date(data.latestDate))
+            // "YYYY-MM-DD" 문자열을 UTC로 파싱하면 KST에서 하루 밀리므로
+            // 로컬 타임존 기준으로 파싱
+            const [y, m, d] = data.latestDate.split('-').map(Number)
+            setSelectedDate(new Date(y, m - 1, d))
           } else {
             // Fallback to today if no data exists
             setSelectedDate(new Date())

@@ -9,18 +9,19 @@ export async function GET(request: NextRequest) {
         const date = searchParams.get('date')
         const getLatest = searchParams.get('latest')
 
-        // Get latest available date
+        // Get latest available date across all three tables (KST 기준)
         if (getLatest === 'true') {
             const res = await pool.query(`
-                SELECT date 
-                FROM company.kis_closing_price_sale 
-                ORDER BY date DESC 
-                LIMIT 1
+                SELECT MAX(kst_date)::text AS date FROM (
+                    SELECT MAX(date AT TIME ZONE 'Asia/Seoul')::date AS kst_date FROM company.kis_closing_price_sale
+                    UNION ALL
+                    SELECT MAX(date AT TIME ZONE 'Asia/Seoul')::date AS kst_date FROM company.kis_closing_price_sale2
+                    UNION ALL
+                    SELECT MAX(date AT TIME ZONE 'Asia/Seoul')::date AS kst_date FROM company.kis_closing_price_sale3
+                ) t
             `)
 
-            return NextResponse.json({
-                latestDate: typeof res.rows[0]?.date === 'string' ? res.rows[0].date.split('T')[0] : (res.rows[0]?.date?.toISOString().split('T')[0] || null)
-            })
+            return NextResponse.json({ latestDate: res.rows[0]?.date || null })
         }
 
         if (!date) {

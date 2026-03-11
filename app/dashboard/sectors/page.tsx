@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { AnalysisHeader } from "@/components/dashboard/analysis-header"
 import { Card } from "@/components/ui/card"
@@ -26,7 +26,7 @@ interface SectorDetail {
   "세부정보": string
 }
 
-export default function SectorsPage() {
+function SectorsContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const initialName = searchParams.get('name')
@@ -258,5 +258,13 @@ export default function SectorsPage() {
         </Card>
       )}
     </div>
+  )
+}
+
+export default function SectorsPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-full text-muted-foreground">로딩 중...</div>}>
+      <SectorsContent />
+    </Suspense>
   )
 }
