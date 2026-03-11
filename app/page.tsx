@@ -20,16 +20,10 @@ export default function IndexPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setErrorMsg("")
-
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    setIsLoading(false)
-
-    if (error) {
-      setErrorMsg("이메일 또는 비밀번호가 올바르지 않습니다.")
-    } else {
+    setTimeout(() => {
+      setIsLoading(false)
       router.push("/dashboard")
-    }
+    }, 300)
   }
 
   const handleSocialLogin = () => {

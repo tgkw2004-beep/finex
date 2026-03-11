@@ -27,7 +27,6 @@ const navigation = [
   { name: "성장주 분석", href: "/dashboard/growth", icon: Zap },
   { name: "배당주 분석", href: "/dashboard/dividend", icon: Coins },
   { name: "기술적 분석", href: "/dashboard/technical", icon: BarChart3 },
-  { name: "포트폴리오", href: "/dashboard/portfolio", icon: Target },
 ]
 
 // ... existing imports
@@ -58,30 +57,27 @@ export function DashboardSidebar({ onClose }: { onClose?: () => void }) {
         {navigation.map((item) => {
           const isActive = pathname === item.href
           return (
-            <div key={item.name}>
-              <Link
-                href={item.href}
-                onClick={onClose}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                  isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-                )}
-              >
-                <item.icon className="h-5 w-5" />
-                {item.name}
-              </Link>
-              {/* Add Stock Search below Portfolio */}
-              {item.name === "포트폴리오" && (
-                <div className="mt-4 mb-2 px-1">
-                  <div className="text-xs font-semibold text-muted-foreground mb-2 px-2">종목 검색</div>
-                  <StockSearch />
-                </div>
+            <Link
+              key={item.name}
+              href={item.href}
+              onClick={onClose}
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                isActive
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
               )}
-            </div>
+            >
+              <item.icon className="h-5 w-5" />
+              {item.name}
+            </Link>
           )
         })}
+        {/* 종목 검색 */}
+        <div className="mt-4 mb-2 px-1">
+          <div className="text-xs font-semibold text-muted-foreground mb-2 px-2">종목 검색</div>
+          <StockSearch />
+        </div>
       </nav>
 
       {/* Bottom actions */}
