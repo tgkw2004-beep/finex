@@ -20,10 +20,23 @@ export default function IndexPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setTimeout(() => {
+    setErrorMsg("")
+
+    if (!email || !password) {
+      // 아이디/비밀번호 없이 클릭 시 비회원으로 진입
       setIsLoading(false)
       router.push("/dashboard")
-    }, 300)
+      return
+    }
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    setIsLoading(false)
+
+    if (error) {
+      setErrorMsg("이메일 또는 비밀번호가 올바르지 않습니다.")
+    } else {
+      router.push("/dashboard")
+    }
   }
 
   const handleSocialLogin = () => {
@@ -54,7 +67,6 @@ export default function IndexPage() {
                 placeholder="name@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
               />
             </div>
             <div className="space-y-1.5">
@@ -65,14 +77,13 @@ export default function IndexPage() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
               />
             </div>
             {errorMsg && (
               <p className="text-xs text-red-500">{errorMsg}</p>
             )}
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "로그인 중..." : "로그인"}
+              {isLoading ? "입장 중..." : "로그인 / 비회원 입장"}
             </Button>
           </form>
 

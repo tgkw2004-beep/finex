@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -18,6 +19,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { StockSearch } from "@/components/dashboard/stock-search"
+import { supabase } from "@/lib/supabase/client"
 
 const navigation = [
   { name: "대시보드", href: "/dashboard", icon: LayoutDashboard },
@@ -27,12 +29,26 @@ const navigation = [
   { name: "성장주 분석", href: "/dashboard/growth", icon: Zap },
   { name: "배당주 분석", href: "/dashboard/dividend", icon: Coins },
   { name: "기술적 분석", href: "/dashboard/technical", icon: BarChart3 },
+  { name: "포트폴리오", href: "/dashboard/portfolio", icon: Target },
 ]
 
 // ... existing imports
 
 export function DashboardSidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname()
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsLoggedIn(!!session)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   return (
     <aside className="flex h-full w-64 flex-col border-r border-border/40 bg-card">
@@ -55,6 +71,7 @@ export function DashboardSidebar({ onClose }: { onClose?: () => void }) {
       {/* Navigation */}
       <nav className="flex-1 space-y-1 overflow-y-auto p-4">
         {navigation.map((item) => {
+          if (item.name === "포트폴리오" && !isLoggedIn) return null;
           const isActive = pathname === item.href
           return (
             <Link
@@ -91,8 +108,9 @@ export function DashboardSidebar({ onClose }: { onClose?: () => void }) {
         </Link>
         <button
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-          onClick={() => {
-            // Logout logic here
+          onClick={async () => {
+            await supabase.auth.signOut()
+            window.location.href = "/"
           }}
         >
           <LogOut className="h-5 w-5" />
