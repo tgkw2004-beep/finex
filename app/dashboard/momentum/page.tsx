@@ -10,6 +10,8 @@ import { TrendingDown, BarChart3, LineChart, TrendingUp, Clock } from "lucide-re
 
 const shortTermStrategies = [
   { name: "종가매매", href: "/dashboard/momentum/short/closing", icon: Clock, description: "종가 기준 매매 전략" },
+  { name: "반등수급", href: "/dashboard/momentum/short/rebound", icon: TrendingUp, description: "단기 하락 후 수급 유입 반등 종목" },
+  { name: "신규상장", href: "/dashboard/momentum/short/ipo", icon: TrendingUp, description: "최근 6개월 신규 상장 종목 분석" },
   { name: "눌림목", href: "/dashboard/momentum/short/pullback", icon: TrendingDown, description: "상승 후 조정 구간 진입점 포착" },
   { name: "거래량", href: "/dashboard/momentum/short/volume", icon: BarChart3, description: "거래량 급증 종목 탐지" },
   { name: "이동평균", href: "/dashboard/momentum/short/ma", icon: LineChart, description: "이동평균선 돌파 신호" },
