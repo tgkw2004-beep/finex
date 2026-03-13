@@ -9,6 +9,13 @@ import { ArrowLeft, Clock, Zap, TrendingUp, BarChart } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 
+import { format } from "date-fns"
+import { ko } from "date-fns/locale"
+import { CalendarIcon } from "lucide-react"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
+
 interface RecentListing {
   listing_date: string
   wics_name: string
@@ -36,7 +43,9 @@ interface MacdSignal {
 }
 
 export default function IpoPage() {
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [loading, setLoading] = useState(true)
+  const [dayCounts, setDayCounts] = useState<Record<string, number>>({})
   const [data, setData] = useState<{
     recentListings: RecentListing[]
     supplyStrategy: SupplyStrategy[]
@@ -49,11 +58,50 @@ export default function IpoPage() {
     macdRsiSignals: []
   })
 
+  // Fetch calendar stats
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const response = await fetch('/api/momentum/ipo?stats=true')
+        if (response.ok) {
+          const result = await response.json()
+          setDayCounts(result.stats || {})
+        }
+      } catch (error) {
+        console.error('Failed to fetch calendar stats:', error)
+      }
+    }
+    fetchStats()
+  }, [])
+
+  // Fetch latest available date
+  useEffect(() => {
+    async function fetchLatestDate() {
+      try {
+        const response = await fetch('/api/momentum/ipo?latest=true')
+        if (response.ok) {
+          const result = await response.json()
+          if (result.latestDate) {
+            const [y, m, d] = result.latestDate.split('-').map(Number)
+            setSelectedDate(new Date(y, m - 1, d))
+          } else {
+            setSelectedDate(new Date())
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch latest date:', error)
+        setSelectedDate(new Date())
+      }
+    }
+    fetchLatestDate()
+  }, [])
+
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true)
-        const response = await fetch('/api/momentum/ipo')
+        const dateStr = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : ''
+        const response = await fetch(`/api/momentum/ipo${dateStr ? `?date=${dateStr}` : ''}`)
         if (response.ok) {
           const result = await response.json()
           setData(result)
@@ -65,7 +113,7 @@ export default function IpoPage() {
       }
     }
     fetchData()
-  }, [])
+  }, [selectedDate])
 
   const formatNumber = (num: any) => Number(num || 0).toLocaleString()
 
@@ -118,6 +166,36 @@ export default function IpoPage() {
         title="신규상장종목 분석"
         description="최근 6개월 내 상장된 종목들의 수급 및 기술적 지표를 다각도로 분석합니다"
       />
+
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "w-[240px] justify-start text-left font-normal",
+                !selectedDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {selectedDate ? format(selectedDate, "PPP", { locale: ko }) : <span>날짜 선택...</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={selectedDate || undefined}
+              onSelect={(date) => date && setSelectedDate(date)}
+              initialFocus
+              dayCounts={dayCounts}
+            />
+          </PopoverContent>
+        </Popover>
+
+        <div className="text-sm text-muted-foreground">
+          전체 결과: <span className="font-bold text-primary">{data.recentListings.length + data.supplyStrategy.length + data.macdSignals.length + data.macdRsiSignals.length}</span> 종목
+        </div>
+      </div>
 
       {loading ? (
         <Card className="p-12 text-center text-muted-foreground">데이터를 분석하는 중...</Card>

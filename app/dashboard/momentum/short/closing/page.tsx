@@ -41,7 +41,24 @@ export default function ClosingPage() {
   const [table3Data, setTable3Data] = useState<ClosingStock[]>([])
   const [hasData, setHasData] = useState({ table1: false, table2: false, table3: false })
   const [loading, setLoading] = useState(true)
+  const [dayCounts, setDayCounts] = useState<Record<string, number>>({})
   const [viewMode, setViewMode] = useState<ViewMode>('all')
+
+  // Fetch calendar stats
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const response = await fetch('/api/momentum/closing?stats=true')
+        if (response.ok) {
+          const result = await response.json()
+          setDayCounts(result.stats || {})
+        }
+      } catch (error) {
+        console.error('Failed to fetch calendar stats:', error)
+      }
+    }
+    fetchStats()
+  }, [])
 
   // Fetch latest available date on mount
   useEffect(() => {
@@ -290,6 +307,7 @@ export default function ClosingPage() {
               selected={selectedDate || undefined}
               onSelect={(date) => date && setSelectedDate(date)}
               initialFocus
+              dayCounts={dayCounts}
             />
           </PopoverContent>
         </Popover>

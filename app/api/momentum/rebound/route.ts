@@ -19,6 +19,25 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ latestDate: res.rows[0]?.date || null })
         }
 
+        // Stats mode for calendar counts
+        const getStats = searchParams.get('stats')
+        if (getStats === 'true') {
+            const res = await pool.query(`
+                SELECT to_char(date, 'yyyy-MM-dd') as date
+                     , count(*) as count
+                FROM visual.vsl_macd_btm_supply
+                GROUP BY date
+                ORDER BY date DESC
+            `)
+            
+            const statsMap = res.rows.reduce((acc: any, row: any) => {
+                acc[row.date] = parseInt(row.count)
+                return acc
+            }, {})
+
+            return NextResponse.json({ stats: statsMap })
+        }
+
         if (!date) {
             return NextResponse.json(
                 { error: 'Date parameter is required' },

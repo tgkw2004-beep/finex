@@ -48,6 +48,7 @@ const ITEMS_PER_PAGE = 10
 export default function PullbackPage() {
   const [data, setData] = useState<PullbackRow[]>([])
   const [loading, setLoading] = useState(true)
+  const [dayCounts, setDayCounts] = useState<Record<string, number>>({})
   const [nameFilter, setNameFilter] = useState('')
   const [nameInput, setNameInput] = useState('')
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
@@ -104,6 +105,22 @@ export default function PullbackPage() {
 
   useEffect(() => { fetchData() }, [nameFilter])
 
+  // Fetch calendar stats
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const response = await fetch('/api/momentum/pullback?stats=true')
+        if (response.ok) {
+          const result = await response.json()
+          setDayCounts(result.stats || {})
+        }
+      } catch (error) {
+        console.error('Failed to fetch calendar stats:', error)
+      }
+    }
+    fetchStats()
+  }, [])
+
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
       setSelectedDate(date)
@@ -159,7 +176,7 @@ export default function PullbackPage() {
               selected={selectedDate || undefined}
               onSelect={handleDateSelect}
               disabled={isDateDisabled}
-              initialFocus
+              dayCounts={dayCounts}
             />
           </PopoverContent>
         </Popover>

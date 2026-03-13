@@ -41,6 +41,23 @@ export default function ReboundPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [data, setData] = useState<ReboundStock[]>([])
   const [loading, setLoading] = useState(true)
+  const [dayCounts, setDayCounts] = useState<Record<string, number>>({})
+
+  // Fetch calendar stats
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const response = await fetch('/api/momentum/rebound?stats=true')
+        if (response.ok) {
+          const result = await response.json()
+          setDayCounts(result.stats || {})
+        }
+      } catch (error) {
+        console.error('Failed to fetch calendar stats:', error)
+      }
+    }
+    fetchStats()
+  }, [])
 
   // Fetch latest available date
   useEffect(() => {
@@ -126,6 +143,7 @@ export default function ReboundPage() {
               selected={selectedDate || undefined}
               onSelect={(date) => date && setSelectedDate(date)}
               initialFocus
+              dayCounts={dayCounts}
             />
           </PopoverContent>
         </Popover>

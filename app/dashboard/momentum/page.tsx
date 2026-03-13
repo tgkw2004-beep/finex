@@ -6,12 +6,14 @@ import { AnalysisHeader } from "@/components/dashboard/analysis-header"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { TrendingDown, BarChart3, LineChart, TrendingUp, Clock } from "lucide-react"
+import { TrendingDown, BarChart3, LineChart, TrendingUp, Clock, Zap, Layers, ShoppingBag, Target, Activity, Users, Banknote } from "lucide-react"
 
 const shortTermStrategies = [
   { name: "종가매매", href: "/dashboard/momentum/short/closing", icon: Clock, description: "종가 기준 매매 전략" },
   { name: "반등수급", href: "/dashboard/momentum/short/rebound", icon: TrendingUp, description: "단기 하락 후 수급 유입 반등 종목" },
   { name: "신규상장", href: "/dashboard/momentum/short/ipo", icon: TrendingUp, description: "최근 6개월 신규 상장 종목 분석" },
+  { name: "256(단기)", href: "/dashboard/momentum/short/technique256short", icon: Zap, description: "3일선 60일선 돌파 역배열 분석(단기)" },
+  { name: "256(장기)", href: "/dashboard/momentum/short/technique256long", icon: TrendingUp, description: "수급선/생명선 60일선 돌파 분석(장기)" },
   { name: "눌림목", href: "/dashboard/momentum/short/pullback", icon: TrendingDown, description: "상승 후 조정 구간 진입점 포착" },
   { name: "거래량", href: "/dashboard/momentum/short/volume", icon: BarChart3, description: "거래량 급증 종목 탐지" },
   { name: "이동평균", href: "/dashboard/momentum/short/ma", icon: LineChart, description: "이동평균선 돌파 신호" },
@@ -19,15 +21,23 @@ const shortTermStrategies = [
 ]
 
 const swingStrategies = [
+  { name: "퀀트매수", href: "/dashboard/momentum/swing/quant", icon: Activity, description: "전략별 보린저 밴드 퀀트 분석" },
+  { name: "눌림목매매", href: "/dashboard/momentum/swing/pullback", icon: Target, description: "Edge/Return/Prime 3단계 눌림목 분석" },
+  { name: "2060프로그램", href: "/dashboard/momentum/swing/program2060", icon: ShoppingBag, description: "프로그램 매수 수급 기반 스윙 분석" },
+  { name: "징검다리", href: "/dashboard/momentum/swing/steppingstone", icon: Layers, description: "스윙 기반 징검다리 패턴 분석" },
   { name: "추세전환", href: "/dashboard/momentum/swing/reversal", icon: TrendingUp, description: "추세 전환 신호 포착" },
   { name: "박스권돌파", href: "/dashboard/momentum/swing/breakout", icon: BarChart3, description: "박스권 상단 돌파 종목" },
   { name: "지지선반등", href: "/dashboard/momentum/swing/support", icon: LineChart, description: "주요 지지선 반등 종목" },
 ]
 
 const trendStrategies = [
+  { name: "최근거래대금", href: "/dashboard/momentum/trend/trade-amount", icon: Banknote, description: "급증한 거래대금 규모별 주도주 분석" },
+  { name: "연기금 수급분석", href: "/dashboard/momentum/trend/pension", icon: Users, description: "연기금 순매수 및 연속 매수 종목 분석" },
   { name: "장기상승", href: "/dashboard/momentum/trend/uptrend", icon: TrendingUp, description: "장기 상승 추세 유지 종목" },
   { name: "신고가", href: "/dashboard/momentum/trend/high", icon: BarChart3, description: "52주 신고가 돌파 종목" },
   { name: "기관매집", href: "/dashboard/momentum/trend/institution", icon: LineChart, description: "기관 순매수 누적 종목" },
+  { name: "스토캐스틱", href: "/dashboard/momentum/trend/stochastic", icon: TrendingUp, description: "정밀 지표 결합을 통한 매수 급소 포착" },
+  { name: "수급분석", href: "/dashboard/momentum/trend/supply-demand", icon: Users, description: "기관/외국인 자금 흐실 및 추세 장악 신호 분석" },
 ]
 
 export default function MomentumPage() {

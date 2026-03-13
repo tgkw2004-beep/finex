@@ -5,6 +5,38 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
+    const getStats = searchParams.get('stats')
+    if (getStats === 'true') {
+        try {
+            const res = await pool.query(`
+                WITH stock_data AS (
+                    SELECT a.code, a.date, a.open, a.high, a.trade_value, b.cap
+                    FROM company.krx_stocks_ohlcv AS a
+                    LEFT JOIN company.krx_stocks_cap AS b ON a.code = b.code AND a.date = b.date
+                    WHERE a.date >= CURRENT_DATE - INTERVAL '1 month'
+                ),
+                final AS (
+                    SELECT date FROM stock_data WHERE (high - open) / NULLIF(open, 0) >= 0.10 AND trade_value > 100000000000 AND cap >= 10000000000000
+                    UNION ALL
+                    SELECT date FROM stock_data WHERE (high - open) / NULLIF(open, 0) >= 0.15 AND trade_value > 100000000000 AND cap < 10000000000000
+                    UNION ALL
+                    SELECT date FROM stock_data WHERE (high - open) / NULLIF(open, 0) >= 0.15 AND trade_value > 50000000000
+                )
+                SELECT to_char(date, 'yyyy-MM-dd') as date, count(*) as count
+                FROM final
+                GROUP BY date
+                ORDER BY date DESC
+            `)
+            const statsMap = res.rows.reduce((acc: any, row: any) => {
+                acc[row.date] = parseInt(row.count)
+                return acc
+            }, {})
+            return NextResponse.json({ stats: statsMap })
+        } catch (e: any) {
+            return NextResponse.json({ error: e.message }, { status: 500 })
+        }
+    }
+
     const stockName = searchParams.get('name') // optional stock name filter
     const date = searchParams.get('date')       // optional date filter
 

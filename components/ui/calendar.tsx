@@ -19,9 +19,11 @@ function Calendar({
   buttonVariant = 'ghost',
   formatters,
   components,
+  dayCounts, // Add dayCounts prop
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
   buttonVariant?: React.ComponentProps<typeof Button>['variant']
+  dayCounts?: Record<string, number> // Record of "YYYY-MM-DD" -> count
 }) {
   const defaultClassNames = getDefaultClassNames()
 
@@ -155,7 +157,7 @@ function Calendar({
             <ChevronDownIcon className={cn('size-4', className)} {...props} />
           )
         },
-        DayButton: CalendarDayButton,
+        DayButton: (props) => <CalendarDayButton {...props} dayCounts={dayCounts} />,
         WeekNumber: ({ children, ...props }) => {
           return (
             <td {...props}>
@@ -176,14 +178,28 @@ function CalendarDayButton({
   className,
   day,
   modifiers,
+  dayCounts,
   ...props
-}: React.ComponentProps<typeof DayButton>) {
+}: React.ComponentProps<typeof DayButton> & {
+  dayCounts?: Record<string, number>
+}) {
   const defaultClassNames = getDefaultClassNames()
 
   const ref = React.useRef<HTMLButtonElement>(null)
   React.useEffect(() => {
     if (modifiers.focused) ref.current?.focus()
   }, [modifiers.focused])
+
+  // Format date to YYYY-MM-DD for matching
+  const dateKey = React.useMemo(() => {
+    const d = day.date;
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const date = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${date}`;
+  }, [day.date]);
+
+  const count = dayCounts?.[dateKey];
 
   return (
     <Button
@@ -201,12 +217,34 @@ function CalendarDayButton({
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
-        'data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md [&>span]:text-xs [&>span]:opacity-70',
+        'data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground flex aspect-square size-auto w-full min-w-(--cell-size) flex-col items-center justify-center leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md [&>span]:text-xs [&>span]:opacity-70 p-0',
         defaultClassNames.day,
         className,
       )}
       {...props}
-    />
+    >
+      <span className={cn("relative z-10", count && count > 0 && !modifiers.outside && "mb-3")}>
+        {props.children}
+      </span>
+      {count && count > 0 && !modifiers.outside && (
+        <div className="absolute inset-x-0 bottom-1 flex justify-center pointer-events-none">
+          <span 
+            className={cn(
+              "flex h-4 min-w-[22px] items-center justify-center rounded-full px-1.5 text-[9px] font-black shadow-lg ring-1 ring-inset transition-all backdrop-blur-sm",
+              modifiers.selected 
+                ? "bg-white text-rose-600 ring-white/30" 
+                : "bg-rose-500/90 text-white ring-rose-400/50"
+            )}
+          >
+            {count}
+          </span>
+        </div>
+      )}
+      {/* High-end background indicator */}
+      {count && count > 0 && !modifiers.outside && !modifiers.selected && (
+        <div className="absolute inset-[2px] rounded-lg bg-rose-500/[0.03] border border-rose-500/10 -z-10" />
+      )}
+    </Button>
   )
 }
 
